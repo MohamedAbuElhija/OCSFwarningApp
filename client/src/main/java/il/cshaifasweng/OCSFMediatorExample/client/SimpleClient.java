@@ -3,10 +3,11 @@ package il.cshaifasweng.OCSFMediatorExample.client;
 import org.greenrobot.eventbus.EventBus;
 
 import il.cshaifasweng.OCSFMediatorExample.client.ocsf.AbstractClient;
+import il.cshaifasweng.OCSFMediatorExample.entities.GameMessage;
 import il.cshaifasweng.OCSFMediatorExample.entities.Warning;
 
 public class SimpleClient extends AbstractClient {
-	
+
 	private static SimpleClient client = null;
 
 	private SimpleClient(String host, int port) {
@@ -15,20 +16,26 @@ public class SimpleClient extends AbstractClient {
 
 	@Override
 	protected void handleMessageFromServer(Object msg) {
-		if (msg.getClass().equals(Warning.class)) {
+		// 1. Check if the message is our game message
+		if (msg instanceof GameMessage) {
+			// Wrap it in GameEvent and post it to the EventBus
+			EventBus.getDefault().post(new GameEvent((GameMessage) msg));
+		}
+		// 2. Keep support for the original warning messages
+		else if (msg instanceof Warning) {
 			EventBus.getDefault().post(new WarningEvent((Warning) msg));
 		}
-		else{
+		// 3. Any other general string/object messages
+		else {
 			String message = msg.toString();
-			System.out.println(message);
+			System.out.println("Received from server: " + message);
 		}
 	}
-	
+
 	public static SimpleClient getClient() {
 		if (client == null) {
 			client = new SimpleClient("localhost", 3000);
 		}
 		return client;
 	}
-
 }

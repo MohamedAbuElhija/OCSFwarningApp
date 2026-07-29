@@ -6,6 +6,9 @@ import il.cshaifasweng.OCSFMediatorExample.client.ocsf.AbstractClient;
 import il.cshaifasweng.OCSFMediatorExample.entities.GameMessage;
 import il.cshaifasweng.OCSFMediatorExample.entities.Warning;
 
+/**
+ * Singleton Client instance managing socket connection and EventBus distribution.
+ */
 public class SimpleClient extends AbstractClient {
 
 	private static SimpleClient client = null;
@@ -32,10 +35,20 @@ public class SimpleClient extends AbstractClient {
 		}
 	}
 
-	public static SimpleClient getClient() {
+	/**
+	 * Overloaded Singleton getter supporting custom target server host (IP or domain).
+	 */
+	public static SimpleClient getClient(String host) {
 		if (client == null) {
-			client = new SimpleClient("localhost", 3000);
+			client = new SimpleClient(host, 3000);
 		}
 		return client;
+	}
+
+	/**
+	 * Default Singleton getter fallback to localhost.
+	 */
+	public static SimpleClient getClient() {
+		return getClient("localhost");
 	}
 }
